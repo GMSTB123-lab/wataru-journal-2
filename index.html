@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wataru Journal">
+<title>Wataru Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F8FC;--sur:#FFF;--sur2:#EEF2FA;--bdr:#E0E6F0;
+  --navy:#0F172A;--navy2:#1E293B;
+  --cyan:#00C2FF;--cyan-bg:#E6F9FF;
+  --yellow:#FFD400;--orange:#FF8C00;--orange-bg:#FFF3E0;
+  --green-bg:#DCFCE7;--purple-bg:#F3F0FF;--purple:#7C3AED;
+  --text:#0F172A;--mid:#475569;--soft:#94A3B8;
+  --r:14px;--rs:9px;
+  --sh:0 2px 14px rgba(15,23,42,.07);--sh2:0 8px 32px rgba(15,23,42,.13);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:4px}
+.app{display:flex;flex-direction:column;min-height:100vh;max-width:640px;margin:0 auto}
+
+/* ─ HEADER ─ */
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.25rem .75rem;position:sticky;top:0;z-index:100;background:rgba(247,248,252,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr)}
+.logo{display:flex;align-items:center;gap:.55rem}
+.logo-icon{width:32px;height:32px;background:var(--navy);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.logo-name{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy)}
+.hdr-date{font-size:.7rem;color:var(--soft);text-align:right;line-height:1.6;font-weight:500}
+
+/* ─ NAV ─ */
+.nav{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bdr);background:rgba(247,248,252,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:sticky;top:62px;z-index:99}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{flex-shrink:0;padding:.7rem 1.1rem;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:var(--soft);border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap}
+.nav-btn:hover{color:var(--navy)}.nav-btn.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+
+/* ─ CONTENT ─ */
+.content{padding:1.4rem 1.25rem;flex:1}
+.pg-title{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--navy);margin-bottom:.2rem}
+.pg-sub{color:var(--mid);font-size:.84rem;margin-bottom:1.4rem;line-height:1.65}
+
+/* ─ SECTION CARDS ─ */
+.sc{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:.7rem;box-shadow:var(--sh);transition:box-shadow .18s}
+.sc:focus-within{box-shadow:0 0 0 2px var(--cyan),var(--sh)}
+.sc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.tag{display:inline-flex;align-items:center;font-size:.69rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .55rem;border-radius:100px}
+.t-pl{background:var(--cyan-bg);color:#0080A8}.t-gr{background:var(--purple-bg);color:var(--purple)}
+.t-go{background:var(--green-bg);color:#166534}.t-be{background:var(--orange-bg);color:#B45309}
+.t-fr{background:var(--sur2);color:var(--mid)}
+.mic{width:27px;height:27px;border-radius:50%;border:1px solid var(--bdr);background:var(--sur2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .15s;flex-shrink:0}
+.mic:hover{background:var(--cyan-bg);border-color:var(--cyan)}.mic.rec{background:#FEE2E2;border-color:#EF4444;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+textarea{width:100%;background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.91rem;line-height:1.7;outline:none;resize:none;min-height:60px;padding:0}
+textarea.sm{min-height:40px}textarea::placeholder{color:var(--soft)}
+
+/* ─ BUTTONS ─ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem 1.4rem;border:none;border-radius:var(--rs);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:700;transition:all .18s;white-space:nowrap}
+.btn-nv{background:var(--navy);color:#fff}.btn-nv:hover:not(:disabled){background:var(--navy2);transform:translateY(-1px);box-shadow:var(--sh)}
+.btn-nv:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-cy{background:var(--cyan);color:var(--navy)}.btn-cy:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
+.btn-cy:disabled{opacity:.45;cursor:not-allowed}
+.btn-gh{background:var(--sur2);color:var(--navy);border:1px solid var(--bdr)}.btn-gh:hover{background:var(--bdr)}
+.btn-sm{padding:.38rem .8rem;font-size:.78rem}.btn-bl{width:100%}
+.row{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+
+/* ─ STATS ─ */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:1.2rem}
+.stat{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rs);padding:.8rem .5rem;text-align:center;box-shadow:var(--sh)}
+.stat-v{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--cyan)}
+.stat-l{font-size:.68rem;color:var(--soft);font-weight:600;margin-top:1px}
+
+/* ─ AI BOX ─ */
+.ai-box{background:linear-gradient(135deg,var(--navy) 0%,#162844 100%);border-radius:var(--r);padding:1.1rem 1.2rem;margin-top:1rem;color:#fff}
+.ai-lbl{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:.4rem}
+.ai-txt{font-size:.88rem;line-height:1.78;color:rgba(255,255,255,.88)}
+
+/* ─ CARD ─ */
+.card{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:1.1rem;margin-bottom:.75rem;box-shadow:var(--sh)}
+.card-cy{border-left:3px solid var(--cyan)}.card-or{border-left:3px solid var(--orange)}
+
+/* ─ LOADING ─ */
+.spin-wrap{padding:1.75rem;text-align:center}
+.spin{width:26px;height:26px;border:3px solid var(--bdr);border-top-color:var(--cyan);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto .6rem}
+@keyframes sp{to{transform:rotate(360deg)}}.spin-txt{font-size:.84rem;color:var(--soft);font-weight:500}
+
+/* ─ AI BODY ─ */
+.ai-body{font-size:.88rem;line-height:1.78;color:var(--mid)}
+.ai-body h2{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--navy);margin:1rem 0 .35rem}
+.ai-body h3{font-size:.9rem;font-weight:700;color:var(--navy);margin:.75rem 0 .25rem}
+.ai-body p{margin-bottom:.4rem}.ai-body ul{padding-left:1.1rem;margin-bottom:.4rem}.ai-body li{margin:.22rem 0}
+.ai-body strong{color:var(--navy);font-weight:700}.ai-body hr{border:none;border-top:1px solid var(--bdr);margin:.75rem 0}
+
+/* ─ INSIGHTS TABS ─ */
+.ins-tabs{display:flex;gap:.4rem;margin-bottom:1.25rem;border-bottom:1px solid var(--bdr);padding-bottom:.75rem}
+.ins-tab{padding:.45rem 1rem;border-radius:100px;cursor:pointer;border:1.5px solid var(--bdr);background:var(--sur);font-size:.82rem;font-weight:600;color:var(--mid);transition:all .18s}
+.ins-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ─ CHAT ─ */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:400px}
+.chat-messages{flex:1;overflow-y:auto;padding:.5rem 0;display:flex;flex-direction:column;gap:.65rem}
+.chat-msg{display:flex;gap:.55rem;align-items:flex-start}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;margin-top:2px}
+.chat-avatar.ai{background:var(--navy);color:var(--cyan)}
+.chat-avatar.user{background:var(--cyan);color:var(--navy)}
+.chat-bubble{max-width:82%;padding:.7rem .9rem;border-radius:12px;font-size:.88rem;line-height:1.7}
+.chat-msg.ai .chat-bubble{background:var(--sur);border:1px solid var(--bdr);color:var(--text);border-radius:4px 12px 12px 12px;box-shadow:var(--sh)}
+.chat-msg.user .chat-bubble{background:var(--navy);color:#fff;border-radius:12px 4px 12px 12px}
+.chat-bubble .ai-body{font-size:.88rem}
+.chat-input-row{display:flex;gap:.5rem;padding-top:.75rem;border-top:1px solid var(--bdr);margin-top:.5rem;align-items:flex-end}
+.chat-textarea{flex:1;background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rs);padding:.65rem .85rem;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);outline:none;resize:none;min-height:44px;max-height:120px;line-height:1.6;transition:border .18s}
+.chat-textarea:focus{border-color:var(--cyan)}
+.chat-textarea::placeholder{color:var(--soft)}
+.chat-send{width:40px;height:40px;border-radius:50%;background:var(--cyan);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;transition:all .18s;color:var(--navy)}
+.chat-send:hover{filter:brightness(1.08);transform:scale(1.05)}
+.chat-send:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.chat-hint{font-size:.75rem;color:var(--soft);margin-bottom:.75rem;line-height:1.6}
+
+/* ─ HISTORY ─ */
+.search-wrap{position:relative;margin-bottom:1rem}
+.s-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--soft);font-size:.88rem;pointer-events:none}
+.s-input{width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rs);padding:.65rem .85rem .65rem 2.2rem;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:border .18s}
+.s-input:focus{border-color:var(--cyan)}.s-input::placeholder{color:var(--soft)}
+
+/* ─ CALENDAR ─ */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.cal-m{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--navy)}
+.cal-arr{width:30px;height:30px;border:1px solid var(--bdr);background:var(--sur);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--mid);transition:all .15s}
+.cal-arr:hover{background:var(--sur2);border-color:var(--cyan);color:var(--cyan)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{text-align:center;font-size:.63rem;font-weight:700;color:var(--soft);letter-spacing:.06em;padding:.3rem 0;text-transform:uppercase}
+.cal-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.8rem;font-weight:500;transition:all .15s;cursor:default;position:relative}
+.cal-cell.has{cursor:pointer;background:var(--cyan-bg);color:var(--navy);font-weight:700}
+.cal-cell.has:hover{background:var(--cyan);color:#fff;transform:scale(1.08)}
+.cal-cell.today{outline:2px solid var(--cyan);outline-offset:1px}
+.cal-cell.sel{background:var(--navy)!important;color:#fff!important}
+.cal-cell.empty{opacity:0}
+
+/* ─ MONTHLY SUMMARY ─ */
+.ms-box{background:linear-gradient(135deg,var(--navy) 0%,#1a3050 100%);border-radius:var(--r);padding:1.1rem 1.2rem;margin-top:1rem;color:#fff}
+.ms-lbl{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:.45rem}
+.ms-body{font-size:.87rem;line-height:1.75;color:rgba(255,255,255,.88)}
+
+/* ─ ENTRY DISPLAY ─ */
+.e-date{font-size:.72rem;font-weight:700;color:var(--soft);letter-spacing:.05em;margin-bottom:.7rem}
+.ef{margin-bottom:.45rem;font-size:.87rem;line-height:1.65;color:var(--mid)}
+.ef strong{color:var(--navy);font-weight:700;font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:1px}
+.e-sum{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--bdr);font-size:.82rem;color:var(--soft);line-height:1.65}
+.e-sum strong{color:var(--cyan);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:1px}
+
+/* ─ SEARCH RESULTS ─ */
+.sr-lbl{font-size:.75rem;font-weight:700;color:var(--soft);letter-spacing:.05em;margin-bottom:.75rem}
+.no-res{text-align:center;padding:2.5rem 1rem;color:var(--soft);font-size:.88rem}
+
+/* ─ DB STATUS ─ */
+.db-status{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;padding:.22rem .6rem;border-radius:100px;font-weight:600}
+.db-ok{background:#DCFCE7;color:#166534}.db-local{background:var(--yellow);color:#713F12}.db-err{background:#FEE2E2;color:#B91C1C}
+
+/* ─ TOAST ─ */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.82rem;font-weight:600;padding:.6rem 1.3rem;border-radius:100px;z-index:9999;white-space:nowrap;box-shadow:var(--sh2);animation:tIn .28s ease;pointer-events:none}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+@media(max-width:480px){.content{padding:1.1rem 1rem}.chat-wrap{height:calc(100vh - 190px)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-icon">📓</div>
+    <div class="logo-name">Wataru Journal</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.6rem">
+    <span class="db-status db-local" id="db-badge">💾 Local</span>
+    <div class="hdr-date" id="hdr-date"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showTab('journal')">✦ ジャーナル</button>
+  <button class="nav-btn" onclick="showTab('insights')">◈ インサイト</button>
+  <button class="nav-btn" onclick="showTab('history')">◎ 履歴</button>
+</div>
+
+<!-- ══ JOURNAL ══ -->
+<div id="tab-journal" class="content">
+  <div class="pg-title">Today's Entry</div>
+  <div class="pg-sub">5つのセクションを記入して保存。🎤で日本語音声入力できます。</div>
+  <div class="sc"><div class="sc-head"><span class="tag t-pl">📍 Place &amp; Weather</span><button class="mic" id="mic-place" onclick="voice('place')">🎤</button></div><textarea class="sm" id="f-place" placeholder="場所と天気。例：東京、晴れ 22°C"></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-gr">🙏 Gratitude</span><button class="mic" id="mic-gratitude" onclick="voice('gratitude')">🎤</button></div><textarea id="f-gratitude" placeholder="今日感謝していること..."></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-go">✅ Good</span><button class="mic" id="mic-good" onclick="voice('good')">🎤</button></div><textarea id="f-good" placeholder="直近の良かったこと、嬉しかった出来事や行動..."></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-be">🔧 Better</span><button class="mic" id="mic-better" onclick="voice('better')">🎤</button></div><textarea id="f-better" placeholder="もっとよくできること、改善したいこと..."></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-fr">💭 Free Format</span><button class="mic" id="mic-free" onclick="voice('free')">🎤</button></div><textarea id="f-free" placeholder="頭の中にあること、今日やりたいこと、アイデアなど..."></textarea></div>
+  <div class="row" style="margin-top:.25rem">
+    <button class="btn btn-nv" id="save-btn" onclick="saveEntry()">✓ 保存 + AI要約</button>
+    <button class="btn btn-gh btn-sm" onclick="clearFields()">クリア</button>
+  </div>
+  <div id="summary-area"></div>
+  <div class="stats" id="stats" style="display:none">
+    <div class="stat"><div class="stat-v" id="st-total">0</div><div class="stat-l">エントリー</div></div>
+    <div class="stat"><div class="stat-v" id="st-streak">0</div><div class="stat-l">連続日数</div></div>
+    <div class="stat"><div class="stat-v" id="st-days">0</div><div class="stat-l">記録日数</div></div>
+  </div>
+</div>
+
+<!-- ══ INSIGHTS ══ -->
+<div id="tab-insights" class="content" style="display:none">
+  <div class="pg-title">インサイト</div>
+  <div class="pg-sub">日記データをもとにAIが分析・回答します。</div>
+  <div class="ins-tabs">
+    <div class="ins-tab active" onclick="insTab('analysis')">📊 自己分析</div>
+    <div class="ins-tab" onclick="insTab('chat')">💬 日記チャット</div>
+  </div>
+
+  <!-- Analysis pane -->
+  <div id="ins-analysis">
+    <button class="btn btn-cy btn-bl" id="ins-btn" onclick="runInsights()">◈ AI分析を実行する</button>
+    <div id="ins-loading" style="display:none;margin-top:1rem"><div class="card"><div class="spin-wrap"><div class="spin"></div><div class="spin-txt">記録を深く読み込んでいます...</div></div></div></div>
+    <div id="ins-result" style="margin-top:1rem"></div>
+  </div>
+
+  <!-- Chat pane -->
+  <div id="ins-chat" style="display:none">
+    <div class="chat-hint">過去の日記データをもとにAIが答えます。何でも聞いてみてください。<br>例:「最近の私が繰り返し書いていることは?」「仕事への向き合い方はどう変化した?」</div>
+    <div class="chat-wrap">
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg ai">
+          <div class="chat-avatar ai">AI</div>
+          <div class="chat-bubble">こんにちは！あなたの日記データを参照しながら質問に答えます。過去の思考、感情のパターン、気づきなど、何でも聞いてみてください。</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-textarea" id="chat-input" placeholder="日記について質問する..." rows="1" onkeydown="chatKey(event)"></textarea>
+        <button class="chat-send" id="chat-send" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div id="tab-history" class="content" style="display:none">
+  <div class="pg-title">記録履歴</div>
+  <div class="pg-sub" id="hist-sub">読み込み中...</div>
+  <div class="search-wrap">
+    <span class="s-icon">🔍</span>
+    <input class="s-input" id="s-input" type="text" placeholder="キーワードで検索..." oninput="onSearch()">
+  </div>
+  <div id="search-results" style="display:none"></div>
+  <div id="cal-view">
+    <div class="card" style="padding:1.1rem">
+      <div class="cal-nav">
+        <button class="cal-arr" onclick="calMove(-1)">‹</button>
+        <div class="cal-m" id="cal-m"></div>
+        <button class="cal-arr" onclick="calMove(1)">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div id="cal-entry" style="display:none"></div>
+    <div id="ms-box" style="display:none" class="ms-box">
+      <div class="ms-lbl">📊 <span id="ms-lbl-text"></span>のサマリー</div>
+      <div class="ms-body" id="ms-body"></div>
+    </div>
+    <div id="ms-btn-wrap" style="margin-top:.75rem;display:none">
+      <button class="btn btn-gh btn-sm btn-bl" id="ms-btn" onclick="genMonthlySummary()">✦ 月間サマリーをAIで生成</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- .app -->
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+// ══ CONFIG — Tursoに接続する場合はここを書き換える ══
+// STEP: Vercelの環境変数に TURSO_URL と TURSO_TOKEN を設定すれば自動でTursoに切り替わります
+// ここでは直接書かず、/api/db エンドポイント経由で接続します
+const USE_CLOUD_DB = false; // Vercelデプロイ後は自動的にtrueになる
+
+// ══ Constants ══
+const FIELDS = ['place','gratitude','good','better','free'];
+const LABELS = {place:'Place & Weather',gratitude:'Gratitude',good:'Good',better:'Better',free:'Free Format'};
+const LSK = 'wj4';
+
+// ══ State ══
+let entries = [];
+let insightsCache = '';
+let monthlySummaries = {};
+let chatHistory = []; // [{role,content}]
+let calYear, calMonth, selDate = null;
+let activeRec = null;
+let currentInsTab = 'analysis';
+
+// ══ Boot ══
+document.addEventListener('DOMContentLoaded', async () => {
+  const n = new Date();
+  document.getElementById('hdr-date').innerHTML =
+    n.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'})
+    +'<br>'+n.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  calYear = n.getFullYear(); calMonth = n.getMonth();
+  await loadEntries();
+  renderStats(); updateInsBtn();
+});
+
+// ══ DB Layer (local + cloud) ══
+async function loadEntries() {
+  // Try cloud first
+  try {
+    const r = await fetch('/api/db?action=list');
+    if (r.ok) {
+      const d = await r.json();
+      entries = d.entries || [];
+      insightsCache = d.insightsCache || '';
+      monthlySummaries = d.monthlySummaries || {};
+      setBadge('cloud');
+      return;
+    }
+  } catch(e) {}
+  // Fallback: localStorage
+  try {
+    const raw = localStorage.getItem(LSK);
+    if (raw) { const d = JSON.parse(raw); entries=d.entries||[]; insightsCache=d.insightsCache||''; monthlySummaries=d.monthlySummaries||{}; }
+  } catch(e) {}
+  setBadge('local');
+}
+
+async function persistEntry(entry) {
+  try {
+    const r = await fetch('/api/db', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'add_entry', entry}) });
+    if (r.ok) { setBadge('cloud'); return; }
+  } catch(e) {}
+  saveLocal(); setBadge('local');
+}
+
+async function persistState(patch) {
+  Object.assign({insightsCache, monthlySummaries}, patch);
+  if (patch.insightsCache !== undefined) insightsCache = patch.insightsCache;
+  if (patch.monthlySummaries !== undefined) monthlySummaries = patch.monthlySummaries;
+  try {
+    const r = await fetch('/api/db', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'save_state', insightsCache, monthlySummaries}) });
+    if (r.ok) return;
+  } catch(e) {}
+  saveLocal();
+}
+
+function saveLocal() {
+  try { localStorage.setItem(LSK, JSON.stringify({entries, insightsCache, monthlySummaries})); } catch(e) {}
+}
+
+function setBadge(type) {
+  const el = document.getElementById('db-badge');
+  if (type === 'cloud') { el.className='db-status db-ok'; el.textContent='☁ Turso'; }
+  else { el.className='db-status db-local'; el.textContent='💾 Local'; }
+}
+
+// ══ Tab ══
+function showTab(id) {
+  ['journal','insights','history'].forEach(t => document.getElementById('tab-'+t).style.display = t===id?'':'none');
+  document.querySelectorAll('.nav-btn').forEach((b,i) => b.classList.toggle('active', ['journal','insights','history'][i]===id));
+  if (id==='history') renderHistory();
+  if (id==='insights') { renderInsights(); updateInsBtn(); }
+}
+
+function insTab(id) {
+  currentInsTab = id;
+  document.querySelectorAll('.ins-tab').forEach((b,i) => b.classList.toggle('active', ['analysis','chat'][i]===id));
+  document.getElementById('ins-analysis').style.display = id==='analysis'?'':'none';
+  document.getElementById('ins-chat').style.display = id==='chat'?'':'none';
+}
+
+// ══ Voice ══
+function voice(field) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('このブラウザは音声入力に未対応です'); return; }
+  const btn = document.getElementById('mic-'+field);
+  if (activeRec) { activeRec.stop(); return; }
+  const rec = new SR(); rec.lang='ja-JP'; rec.continuous=true; rec.interimResults=true;
+  activeRec=rec; btn.classList.add('rec'); btn.textContent='⏹';
+  let final = document.getElementById('f-'+field).value;
+  rec.onresult = e => {
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('f-'+field).value = final+interim;
+  };
+  const end = () => { btn.classList.remove('rec'); btn.textContent='🎤'; activeRec=null; };
+  rec.onend=end; rec.onerror=end; rec.start();
+}
+
+// ══ Save entry ══
+async function saveEntry() {
+  const vals={}; let ok=false;
+  FIELDS.forEach(f=>{vals[f]=document.getElementById('f-'+f).value.trim(); if(vals[f])ok=true;});
+  if(!ok){toast('何か入力してから保存してください');return;}
+  const btn=document.getElementById('save-btn');
+  btn.disabled=true; btn.textContent='保存中...';
+  let summary='';
+  try{ summary=await aiCall(
+    'あなたは優れたライフコーチです。ジャーナルエントリーを読んで3〜4文で温かく洞察のある要約を日本語で書いてください。思考・感情・気づきの核心を捉え、前向きな視点で締めてください。',
+    '今日のジャーナルを要約してください:\n\n'+FIELDS.filter(f=>vals[f]).map(f=>`[${LABELS[f]}]\n${vals[f]}`).join('\n\n'),
+    []
+  );}catch(e){}
+  const entry={id:String(Date.now()),date:new Date().toISOString(),fields:vals,summary};
+  entries.unshift(entry);
+  await persistEntry(entry);
+  btn.disabled=false; btn.textContent='✓ 保存 + AI要約';
+  toast('✓ 保存しました');
+  renderStats(); updateInsBtn();
+  if(summary) document.getElementById('summary-area').innerHTML=`<div class="ai-box"><div class="ai-lbl">✦ AI 要約</div><div class="ai-txt">${esc(summary)}</div></div>`;
+  clearFields();
+}
+
+function clearFields(){ FIELDS.forEach(f=>document.getElementById('f-'+f).value=''); document.getElementById('summary-area').innerHTML=''; }
+
+function renderStats(){
+  const s=document.getElementById('stats');
+  if(!entries.length){s.style.display='none';return;}
+  s.style.display='grid';
+  document.getElementById('st-total').textContent=entries.length;
+  const days=new Set(entries.map(e=>new Date(e.date).toDateString()));
+  document.getElementById('st-days').textContent=days.size;
+  let streak=0,d=new Date();d.setHours(0,0,0,0);
+  while(days.has(d.toDateString())){streak++;d.setDate(d.getDate()-1);}
+  document.getElementById('st-streak').textContent=streak;
+}
+
+// ══ Insights - Analysis ══
+function updateInsBtn(){
+  const b=document.getElementById('ins-btn');
+  if(b) b.textContent=entries.length>0?`◈ AI分析を実行 (${entries.length}件の記録)`:'◈ AI分析を実行する';
+}
+function renderInsights(){
+  if(insightsCache) document.getElementById('ins-result').innerHTML=`<div class="card card-cy"><div class="ai-body">${md(insightsCache)}</div></div>`;
+}
+async function runInsights(){
+  if(!entries.length){toast('まずジャーナルを記録してください');return;}
+  document.getElementById('ins-loading').style.display='';
+  const b=document.getElementById('ins-btn');b.disabled=true;b.textContent='分析中...';
+  const text=buildEntriesContext(60);
+  const msg=`以下は私のジャーナルです。4点について具体的なインサイトを提供してください。\n\n## ジャーナル記録\n${text}\n\n## 1. 思考・価値観の変遷\n時系列で見た変化・成長のパターン\n\n## 2. 繰り返し現れるテーマと強み\n深層にある動機・こだわり・自分らしさの核心\n\n## 3. 自己分析\n性格・意思決定スタイル・感情パターンの本質\n\n## 4. 人生・仕事の方向性\n今後6〜12ヶ月で進むべき方向と、明日からできる具体的な一歩3つ`;
+  try{
+    const r=await aiCall('あなたは深い洞察力を持つライフコーチ兼自己分析の専門家です。表面的な言葉の先にある深層の動機・パターン・価値観を見抜き、温かく率直に、具体的で行動可能なインサイトを日本語で提供します。',msg,[]);
+    insightsCache=r;
+    await persistState({insightsCache:r});
+    document.getElementById('ins-result').innerHTML=`<div class="card card-cy"><div class="ai-body">${md(r)}</div></div>`;
+  }catch(e){
+    document.getElementById('ins-result').innerHTML=`<div class="card"><p style="color:#EF4444;font-size:.88rem">エラーが発生しました。もう一度お試しください。</p></div>`;
+  }
+  document.getElementById('ins-loading').style.display='none';
+  b.disabled=false; updateInsBtn();
+}
+
+// ══ Insights - Chat ══
+function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+
+async function sendChat(){
+  const input=document.getElementById('chat-input');
+  const q=input.value.trim(); if(!q) return;
+  input.value=''; input.style.height='';
+  const send=document.getElementById('chat-send'); send.disabled=true;
+
+  appendMsg('user', q);
+  const typingId = appendMsg('ai', '<div class="spin" style="width:18px;height:18px;border-width:2px;margin:4px 0"></div>');
+
+  // Build context from entries
+  const ctx = buildEntriesContext(50);
+  const systemPrompt = `あなたは私（ユーザー）の個人ジャーナルアシスタントです。以下は私のこれまでのジャーナル記録です。この記録を参照しながら、私の質問や悩みに対して温かく、具体的に答えてください。記録に基づいた具体的な例を示しながら答えると効果的です。記録にない情報については、その旨を正直に伝えてください。
+
+## ジャーナル記録（最新${Math.min(entries.length,50)}件）
+${ctx}`;
+
+  chatHistory.push({role:'user', content:q});
+
+  try{
+    const r = await aiCall(systemPrompt, null, chatHistory);
+    chatHistory.push({role:'assistant', content:r});
+    updateMsg(typingId, `<div class="ai-body">${md(r)}</div>`);
+  }catch(e){
+    updateMsg(typingId, 'エラーが発生しました。もう一度お試しください。');
+  }
+  send.disabled=false;
+  const msgs=document.getElementById('chat-messages');
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+let msgCounter=0;
+function appendMsg(role, html){
+  const id='msg-'+(++msgCounter);
+  const avatar=role==='ai'?'AI':'私';
+  const div=document.createElement('div');
+  div.className=`chat-msg ${role}`; div.id=id;
+  div.innerHTML=`<div class="chat-avatar ${role}">${avatar}</div><div class="chat-bubble">${html}</div>`;
+  const msgs=document.getElementById('chat-messages');
+  msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight;
+  return id;
+}
+function updateMsg(id, html){
+  const el=document.getElementById(id);
+  if(el) el.querySelector('.chat-bubble').innerHTML=html;
+}
+
+// ══ History ══
+function renderHistory(){
+  document.getElementById('hist-sub').textContent=`${entries.length}件のエントリー`;
+  renderCalendar(); renderMonthlySummaryArea();
+}
+
+function onSearch(){
+  const q=document.getElementById('s-input').value.trim();
+  const sr=document.getElementById('search-results');
+  const cv=document.getElementById('cal-view');
+  if(!q){sr.style.display='none';cv.style.display='';return;}
+  cv.style.display='none'; sr.style.display='';
+  const hits=entries.filter(e=>{
+    const all=[...Object.values(e.fields||{}),e.summary||''].join(' ').toLowerCase();
+    return all.includes(q.toLowerCase());
+  });
+  if(!hits.length){sr.innerHTML=`<div class="no-res">「${esc(q)}」に一致する記録が見つかりませんでした</div>`;return;}
+  sr.innerHTML=`<div class="sr-lbl">${hits.length}件見つかりました</div>`+hits.map(e=>entryCard(e,q)).join('');
+}
+
+function calMove(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}else if(calMonth<0){calMonth=11;calYear--;}renderCalendar();renderMonthlySummaryArea();}
+
+function renderCalendar(){
+  document.getElementById('cal-m').textContent=`${calYear}年${calMonth+1}月`;
+  const grid=document.getElementById('cal-grid');
+  const dows=['日','月','火','水','木','金','土'];
+  let html=dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  const eDates=new Set(entries.map(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth?d.getDate():null;}).filter(Boolean));
+  const today=new Date();
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  for(let i=0;i<firstDay;i++) html+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const hasE=eDates.has(d);
+    const isSel=selDate===ds;
+    const cls=['cal-cell',hasE?'has':'',isToday?'today':'',isSel?'sel':''].filter(Boolean).join(' ');
+    html+=`<div class="${cls}" ${hasE?`onclick="selDay('${ds}')"` : ''}>${d}</div>`;
+  }
+  grid.innerHTML=html;
+}
+
+function selDay(ds){
+  selDate=ds; renderCalendar();
+  const e=entries.find(en=>en.date.startsWith(ds));
+  const el=document.getElementById('cal-entry');
+  if(e){el.style.display='';el.innerHTML=`<div class="card card-cy">${entryInner(e)}</div>`;el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  else{el.style.display='none';}
+}
+
+function renderMonthlySummaryArea(){
+  const key=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const wrap=document.getElementById('ms-btn-wrap');
+  const box=document.getElementById('ms-box');
+  const me=entries.filter(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth;});
+  if(!me.length){wrap.style.display='none';box.style.display='none';return;}
+  document.getElementById('ms-lbl-text').textContent=`${calYear}年${calMonth+1}月`;
+  if(monthlySummaries[key]){
+    box.style.display='';document.getElementById('ms-body').innerHTML=md(monthlySummaries[key]);
+    wrap.style.display='';document.getElementById('ms-btn').textContent='✦ 月間サマリーを再生成';
+  }else{
+    box.style.display='none';wrap.style.display='';
+    document.getElementById('ms-btn').textContent=`✦ ${calYear}年${calMonth+1}月のサマリーをAIで生成`;
+  }
+}
+
+async function genMonthlySummary(){
+  const key=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const me=entries.filter(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth;});
+  if(!me.length){toast('この月の記録がありません');return;}
+  const btn=document.getElementById('ms-btn');btn.disabled=true;btn.textContent='生成中...';
+  const text=me.map(e=>{
+    const d=new Date(e.date).toLocaleDateString('ja-JP');
+    return `${d}: `+FIELDS.filter(f=>e.fields?.[f]).map(f=>e.fields[f]).join(' / ')+(e.summary?' ('+e.summary+')':'');
+  }).join('\n');
+  try{
+    const r=await aiCall(
+      `あなたは優れたライフコーチです。${calYear}年${calMonth+1}月のジャーナル記録を読んで、その月を振り返るサマリーを日本語で書いてください。その月の主なテーマ・感情の流れ・成長・学びを200〜300字程度で自然な文章にまとめてください。`,
+      `以下は${calYear}年${calMonth+1}月の記録です:\n\n${text}`,
+      []
+    );
+    const updated={...monthlySummaries,[key]:r};
+    await persistState({monthlySummaries:updated});
+    document.getElementById('ms-body').innerHTML=md(r);
+    document.getElementById('ms-box').style.display='';
+    btn.textContent='✦ 月間サマリーを再生成';
+  }catch(e){toast('生成に失敗しました');}
+  btn.disabled=false;
+}
+
+// ══ Helpers ══
+function buildEntriesContext(limit=50){
+  return entries.slice(0,limit).map(e=>{
+    const d=new Date(e.date).toLocaleDateString('ja-JP');
+    const parts=FIELDS.filter(f=>e.fields?.[f]).map(f=>`[${LABELS[f]}] ${e.fields[f]}`);
+    return `◆ ${d}\n${parts.join('\n')}${e.summary?'\n→要約: '+e.summary:''}`;
+  }).join('\n\n');
+}
+
+function entryCard(e,q=''){return`<div class="card">${entryInner(e,q)}</div>`;}
+function entryInner(e,q=''){
+  const d=new Date(e.date).toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  const t=new Date(e.date).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  const fields=FIELDS.filter(f=>e.fields?.[f]).map(f=>`<div class="ef"><strong>${LABELS[f]}</strong>${q?hl(e.fields[f],q):esc(e.fields[f])}</div>`).join('');
+  const sum=e.summary?`<div class="e-sum"><strong>AI要約</strong>${q?hl(e.summary,q):esc(e.summary)}</div>`:'';
+  return`<div class="e-date">${d} ${t}</div>${fields}${sum}`;
+}
+
+function hl(text,q){
+  const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  return esc(text).replace(re,m=>`<mark style="background:var(--yellow);border-radius:3px;padding:0 2px">${m}</mark>`);
+}
+
+// ══ Claude API (via Vercel proxy) ══
+async function aiCall(system, userMsg, history=[]) {
+  // Build messages array
+  let messages;
+  if (history && history.length > 0) {
+    // Chat mode: use history directly, system is already embedded
+    messages = history;
+  } else {
+    messages = [{role:'user', content: userMsg}];
+  }
+
+  const res = await fetch('/api/claude', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({system, messages})
+  });
+  if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error||`HTTP ${res.status}`); }
+  const data=await res.json();
+  return data.text||'';
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2800);
+}
+function esc(s=''){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function md(text){
+  if(!text)return'';
+  let h=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');h=h.replace(/^# (.+)$/gm,'<h2>$1</h2>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');h=h.replace(/^---$/gm,'<hr>');
+  h=h.replace(/^[•\-\*] (.+)$/gm,'<li>$1</li>');h=h.replace(/(<li>.*?<\/li>)/gs,m=>`<ul>${m}</ul>`);h=h.replace(/<\/ul>\s*<ul>/g,'');
+  h=h.split('\n').map(l=>{l=l.trim();if(!l)return'';if(/^<(h[23]|ul|li|hr)/.test(l))return l;return`<p>${l}</p>`;}).join('');
+  return h;
+}
+
+// Auto-resize chat textarea
+document.addEventListener('DOMContentLoaded',()=>{
+  const ta=document.getElementById('chat-input');
+  if(ta) ta.addEventListener('input',()=>{ta.style.height='';ta.style.height=Math.min(ta.scrollHeight,120)+'px';});
+});
+</script>
+</body>
+</html>
