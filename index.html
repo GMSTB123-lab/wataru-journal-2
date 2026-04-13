@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wataru Journal">
+<title>Wataru Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F8FC;--sur:#FFF;--sur2:#EEF2FA;--bdr:#E0E6F0;
+  --navy:#0F172A;--navy2:#1E293B;
+  --cyan:#00C2FF;--cyan-bg:#E6F9FF;
+  --yellow:#FFD400;--orange:#FF8C00;--orange-bg:#FFF3E0;
+  --green-bg:#DCFCE7;--purple-bg:#F3F0FF;--purple:#7C3AED;
+  --text:#0F172A;--mid:#475569;--soft:#94A3B8;
+  --r:14px;--rs:9px;
+  --sh:0 2px 14px rgba(15,23,42,.07);--sh2:0 8px 32px rgba(15,23,42,.13);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:4px}
+.app{display:flex;flex-direction:column;min-height:100vh;max-width:680px;margin:0 auto}
+
+/* ─ HEADER ─ */
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1.25rem .75rem;position:sticky;top:0;z-index:100;background:rgba(247,248,252,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr)}
+.logo{display:flex;align-items:center;gap:.55rem}
+.logo-icon{width:32px;height:32px;background:var(--navy);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.logo-name{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--navy)}
+.hdr-right{display:flex;align-items:center;gap:.6rem}
+.hdr-date{font-size:.7rem;color:var(--soft);text-align:right;line-height:1.6;font-weight:500}
+
+/* ─ NAV ─ */
+.nav{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bdr);background:rgba(247,248,252,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:sticky;top:62px;z-index:99}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{flex-shrink:0;padding:.7rem 1rem;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;color:var(--soft);border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap}
+.nav-btn:hover{color:var(--navy)}.nav-btn.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+
+/* ─ CONTENT ─ */
+.content{padding:1.4rem 1.25rem;flex:1}
+.pg-title{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--navy);margin-bottom:.2rem}
+.pg-sub{color:var(--mid);font-size:.84rem;margin-bottom:1.4rem;line-height:1.65}
+
+/* ─ SECTION CARDS ─ */
+.sc{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:.7rem;box-shadow:var(--sh);transition:box-shadow .18s}
+.sc:focus-within{box-shadow:0 0 0 2px var(--cyan),var(--sh)}
+.sc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.tag{display:inline-flex;align-items:center;font-size:.69rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .55rem;border-radius:100px}
+.t-pl{background:var(--cyan-bg);color:#0080A8}.t-gr{background:var(--purple-bg);color:var(--purple)}
+.t-go{background:var(--green-bg);color:#166534}.t-be{background:var(--orange-bg);color:#B45309}
+.t-fr{background:var(--sur2);color:var(--mid)}
+.mic{width:27px;height:27px;border-radius:50%;border:1px solid var(--bdr);background:var(--sur2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .15s;flex-shrink:0}
+.mic:hover{background:var(--cyan-bg);border-color:var(--cyan)}.mic.rec{background:#FEE2E2;border-color:#EF4444;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+textarea{width:100%;background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.91rem;line-height:1.7;outline:none;resize:none;min-height:60px;padding:0}
+textarea.sm{min-height:40px}textarea::placeholder{color:var(--soft)}
+
+/* ─ BUTTONS ─ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem 1.4rem;border:none;border-radius:var(--rs);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:700;transition:all .18s;white-space:nowrap}
+.btn-nv{background:var(--navy);color:#fff}.btn-nv:hover:not(:disabled){background:var(--navy2);transform:translateY(-1px);box-shadow:var(--sh)}
+.btn-nv:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-cy{background:var(--cyan);color:var(--navy)}.btn-cy:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
+.btn-cy:disabled{opacity:.45;cursor:not-allowed}
+.btn-gh{background:var(--sur2);color:var(--navy);border:1px solid var(--bdr)}.btn-gh:hover{background:var(--bdr)}
+.btn-sm{padding:.38rem .8rem;font-size:.78rem}.btn-bl{width:100%}
+.row{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+
+/* ─ STATS ─ */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:1.2rem}
+.stat{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rs);padding:.8rem .5rem;text-align:center;box-shadow:var(--sh)}
+.stat-v{font-family:'DM Serif Display',serif;font-size:1.9rem;color:var(--cyan)}
+.stat-l{font-size:.68rem;color:var(--soft);font-weight:600;margin-top:1px}
+
+/* ─ AI BOX ─ */
+.ai-box{background:linear-gradient(135deg,var(--navy) 0%,#162844 100%);border-radius:var(--r);padding:1.1rem 1.2rem;margin-top:1rem;color:#fff}
+.ai-lbl{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:.4rem}
+.ai-txt{font-size:.88rem;line-height:1.78;color:rgba(255,255,255,.88)}
+
+/* ─ CARD ─ */
+.card{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:1.1rem;margin-bottom:.75rem;box-shadow:var(--sh)}
+.card-cy{border-left:3px solid var(--cyan)}.card-or{border-left:3px solid var(--orange)}
+
+/* ─ LOADING ─ */
+.spin-wrap{padding:1.75rem;text-align:center}
+.spin{width:26px;height:26px;border:3px solid var(--bdr);border-top-color:var(--cyan);border-radius:50%;animation:sp .7s linear infinite;margin:0 auto .6rem}
+@keyframes sp{to{transform:rotate(360deg)}}.spin-txt{font-size:.84rem;color:var(--soft);font-weight:500}
+
+/* ─ AI BODY ─ */
+.ai-body{font-size:.88rem;line-height:1.78;color:var(--mid)}
+.ai-body h2{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--navy);margin:1rem 0 .35rem}
+.ai-body h3{font-size:.9rem;font-weight:700;color:var(--navy);margin:.75rem 0 .25rem}
+.ai-body p{margin-bottom:.4rem}.ai-body ul{padding-left:1.1rem;margin-bottom:.4rem}.ai-body li{margin:.22rem 0}
+.ai-body strong{color:var(--navy);font-weight:700}.ai-body hr{border:none;border-top:1px solid var(--bdr);margin:.75rem 0}
+
+/* ─ INSIGHTS TABS ─ */
+.ins-tabs{display:flex;gap:.4rem;margin-bottom:1.25rem}
+.ins-tab{padding:.45rem 1rem;border-radius:100px;cursor:pointer;border:1.5px solid var(--bdr);background:var(--sur);font-size:.82rem;font-weight:600;color:var(--mid);transition:all .18s}
+.ins-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ─ CHAT ─ */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 230px);min-height:380px}
+.chat-msgs{flex:1;overflow-y:auto;padding:.5rem 0;display:flex;flex-direction:column;gap:.65rem}
+.cmsg{display:flex;gap:.55rem;align-items:flex-start}
+.cmsg.user{flex-direction:row-reverse}
+.cavatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;margin-top:2px}
+.cavatar.ai{background:var(--navy);color:var(--cyan)}.cavatar.user{background:var(--cyan);color:var(--navy)}
+.cbubble{max-width:84%;padding:.7rem .9rem;border-radius:12px;font-size:.88rem;line-height:1.7}
+.cmsg.ai .cbubble{background:var(--sur);border:1px solid var(--bdr);color:var(--text);border-radius:4px 12px 12px 12px;box-shadow:var(--sh)}
+.cmsg.user .cbubble{background:var(--navy);color:#fff;border-radius:12px 4px 12px 12px}
+.chat-bar{display:flex;gap:.5rem;padding-top:.75rem;border-top:1px solid var(--bdr);margin-top:.5rem;align-items:flex-end}
+.chat-ta{flex:1;background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rs);padding:.65rem .85rem;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);outline:none;resize:none;min-height:44px;max-height:120px;line-height:1.6;transition:border .18s}
+.chat-ta:focus{border-color:var(--cyan)}.chat-ta::placeholder{color:var(--soft)}
+.chat-send{width:40px;height:40px;border-radius:50%;background:var(--cyan);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;transition:all .18s;color:var(--navy);font-weight:700}
+.chat-send:hover:not(:disabled){filter:brightness(1.08);transform:scale(1.05)}
+.chat-send:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.chat-hint{font-size:.78rem;color:var(--soft);margin-bottom:.75rem;line-height:1.65;background:var(--sur2);padding:.7rem .9rem;border-radius:var(--rs)}
+
+/* ─ HISTORY SEARCH ─ */
+.sw{position:relative;margin-bottom:1rem}
+.si{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--soft);font-size:.85rem;pointer-events:none}
+.s-inp{width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:var(--rs);padding:.65rem .85rem .65rem 2.15rem;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:border .18s}
+.s-inp:focus{border-color:var(--cyan)}.s-inp::placeholder{color:var(--soft)}
+
+/* ─ CALENDAR ─ */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.cal-m{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--navy)}
+.cal-arr{width:30px;height:30px;border:1px solid var(--bdr);background:var(--sur);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--mid);transition:all .15s}
+.cal-arr:hover{background:var(--sur2);border-color:var(--cyan);color:var(--cyan)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{text-align:center;font-size:.63rem;font-weight:700;color:var(--soft);letter-spacing:.06em;padding:.3rem 0;text-transform:uppercase}
+.cal-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:.8rem;font-weight:500;transition:all .15s;cursor:default}
+.cal-cell.has{cursor:pointer;background:var(--cyan-bg);color:var(--navy);font-weight:700}
+.cal-cell.has:hover{background:var(--cyan);color:#fff;transform:scale(1.08)}
+.cal-cell.today{outline:2px solid var(--cyan);outline-offset:1px}
+.cal-cell.sel{background:var(--navy)!important;color:#fff!important}
+.cal-cell.empty{opacity:0}
+
+/* ─ MONTHLY SUMMARY ─ */
+.ms-box{background:linear-gradient(135deg,var(--navy) 0%,#1a3050 100%);border-radius:var(--r);padding:1.1rem 1.2rem;margin-top:1rem;color:#fff}
+.ms-lbl{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-bottom:.45rem}
+.ms-body{font-size:.87rem;line-height:1.75;color:rgba(255,255,255,.88)}
+
+/* ─ ENTRY ─ */
+.e-date{font-size:.72rem;font-weight:700;color:var(--soft);letter-spacing:.05em;margin-bottom:.7rem}
+.ef{margin-bottom:.45rem;font-size:.87rem;line-height:1.65;color:var(--mid)}
+.ef strong{color:var(--navy);font-weight:700;font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;display:block;margin-bottom:1px}
+.e-sum{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--bdr);font-size:.82rem;color:var(--soft);line-height:1.65}
+.e-sum strong{color:var(--cyan);font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:1px}
+
+/* ─ MONTHLY TABLE VIEW ─ */
+.mv-controls{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;flex-wrap:wrap}
+.mv-select{padding:.45rem .75rem;border:1px solid var(--bdr);border-radius:var(--rs);background:var(--sur);font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--text);outline:none;cursor:pointer}
+.mv-select:focus{border-color:var(--cyan)}
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--bdr);box-shadow:var(--sh)}
+.tbl{width:100%;border-collapse:collapse;min-width:600px}
+.tbl th{background:var(--navy);color:#fff;font-size:.73rem;font-weight:700;padding:.7rem .8rem;text-align:left;white-space:nowrap;letter-spacing:.04em}
+.tbl th:first-child{width:90px}
+.tbl td{font-size:.82rem;padding:.65rem .8rem;vertical-align:top;border-bottom:1px solid var(--bdr);line-height:1.6;color:var(--mid)}
+.tbl td:first-child{font-weight:700;color:var(--navy);white-space:nowrap;background:var(--sur2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#F0F8FD}
+.tbl tr:hover td:first-child{background:#E0F0FB}
+.tbl .empty-cell{color:var(--bdr)}
+
+/* ─ CSV EXPORT ─ */
+.csv-panel{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:1.1rem;margin-bottom:1.25rem;box-shadow:var(--sh)}
+.csv-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.65rem}
+.date-inp{padding:.45rem .7rem;border:1px solid var(--bdr);border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:.83rem;color:var(--text);outline:none;background:var(--sur)}
+.date-inp:focus{border-color:var(--cyan)}
+.csv-sep{color:var(--soft);font-size:.82rem}
+
+/* ─ DB BADGE ─ */
+.db-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .55rem;border-radius:100px;font-weight:700}
+.db-ok{background:#DCFCE7;color:#166534}.db-local{background:var(--yellow);color:#713F12}
+
+/* ─ TOAST ─ */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.82rem;font-weight:600;padding:.6rem 1.3rem;border-radius:100px;z-index:9999;white-space:nowrap;box-shadow:var(--sh2);animation:tIn .28s ease;pointer-events:none}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* ─ NO RESULTS ─ */
+.no-res{text-align:center;padding:2.5rem 1rem;color:var(--soft);font-size:.88rem}
+.sr-lbl{font-size:.75rem;font-weight:700;color:var(--soft);letter-spacing:.05em;margin-bottom:.75rem}
+
+@media(max-width:480px){.content{padding:1.1rem 1rem}.chat-wrap{height:calc(100vh - 210px)}.tbl{min-width:500px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-icon">📓</div>
+    <div class="logo-name">Wataru Journal</div>
+  </div>
+  <div class="hdr-right">
+    <span class="db-badge db-local" id="db-badge">💾 Local</span>
+    <div class="hdr-date" id="hdr-date"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showTab('journal')">✦ ジャーナル</button>
+  <button class="nav-btn" onclick="showTab('insights')">◈ インサイト</button>
+  <button class="nav-btn" onclick="showTab('history')">◎ 履歴</button>
+  <button class="nav-btn" onclick="showTab('monthly')">📊 月間ビュー</button>
+</div>
+
+<!-- ══ JOURNAL ══ -->
+<div id="tab-journal" class="content">
+  <div class="pg-title">Today's Entry</div>
+  <div class="pg-sub">5つのセクションを記入して保存。🎤で日本語音声入力できます。</div>
+  <div class="sc"><div class="sc-head"><span class="tag t-pl">📍 Place &amp; Weather</span><button class="mic" id="mic-place" onclick="voice('place')">🎤</button></div><textarea class="sm" id="f-place" placeholder="場所と天気。例：東京、晴れ 22°C"></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-gr">🙏 Gratitude</span><button class="mic" id="mic-gratitude" onclick="voice('gratitude')">🎤</button></div><textarea id="f-gratitude" placeholder="今日感謝していること..."></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-go">✅ Good</span><button class="mic" id="mic-good" onclick="voice('good')">🎤</button></div><textarea id="f-good" placeholder="直近の良かったこと、嬉しかった出来事や行動..."></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-be">🔧 Better</span><button class="mic" id="mic-better" onclick="voice('better')">🎤</button></div><textarea id="f-better" placeholder="もっとよくできること、改善したいこと..."></textarea></div>
+  <div class="sc"><div class="sc-head"><span class="tag t-fr">💭 Free Format</span><button class="mic" id="mic-free" onclick="voice('free')">🎤</button></div><textarea id="f-free" placeholder="頭の中にあること、今日やりたいこと、アイデアなど..."></textarea></div>
+  <div class="row" style="margin-top:.25rem">
+    <button class="btn btn-nv" id="save-btn" onclick="saveEntry()">✓ 保存 + AI要約</button>
+    <button class="btn btn-gh btn-sm" onclick="clearFields()">クリア</button>
+  </div>
+  <div id="summary-area"></div>
+  <div class="stats" id="stats" style="display:none">
+    <div class="stat"><div class="stat-v" id="st-total">0</div><div class="stat-l">エントリー</div></div>
+    <div class="stat"><div class="stat-v" id="st-streak">0</div><div class="stat-l">連続日数</div></div>
+    <div class="stat"><div class="stat-v" id="st-days">0</div><div class="stat-l">記録日数</div></div>
+  </div>
+</div>
+
+<!-- ══ INSIGHTS ══ -->
+<div id="tab-insights" class="content" style="display:none">
+  <div class="pg-title">インサイト</div>
+  <div class="pg-sub">日記データをもとにAIが分析・回答します。</div>
+  <div class="ins-tabs">
+    <div class="ins-tab active" id="itab-analysis" onclick="insTab('analysis')">📊 自己分析</div>
+    <div class="ins-tab" id="itab-chat" onclick="insTab('chat')">💬 日記チャット</div>
+  </div>
+
+  <!-- Analysis -->
+  <div id="ins-analysis">
+    <button class="btn btn-cy btn-bl" id="ins-btn" onclick="runInsights()">◈ AI分析を実行する</button>
+    <div id="ins-loading" style="display:none;margin-top:1rem"><div class="card"><div class="spin-wrap"><div class="spin"></div><div class="spin-txt">記録を深く読み込んでいます...</div></div></div></div>
+    <div id="ins-result" style="margin-top:1rem"></div>
+  </div>
+
+  <!-- Chat -->
+  <div id="ins-chat" style="display:none">
+    <div class="chat-hint">過去の日記データをもとにAIが答えます。<br>例：「最近繰り返し書いていることは？」「仕事への向き合い方はどう変わった？」「私の強みは何？」</div>
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="cmsg ai">
+          <div class="cavatar ai">AI</div>
+          <div class="cbubble">こんにちは！あなたの日記データを参照しながら質問に答えます。何でも聞いてみてください。</div>
+        </div>
+      </div>
+      <div class="chat-bar">
+        <textarea class="chat-ta" id="chat-inp" placeholder="日記について質問する..." rows="1" onkeydown="chatKey(event)"></textarea>
+        <button class="chat-send" id="chat-send-btn" onclick="sendChat()">↑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div id="tab-history" class="content" style="display:none">
+  <div class="pg-title">記録履歴</div>
+  <div class="pg-sub" id="hist-sub">読み込み中...</div>
+  <div class="sw"><span class="si">🔍</span><input class="s-inp" id="s-inp" type="text" placeholder="キーワードで検索..." oninput="onSearch()"></div>
+  <div id="search-res" style="display:none"></div>
+  <div id="cal-view">
+    <div class="card" style="padding:1.1rem">
+      <div class="cal-nav">
+        <button class="cal-arr" onclick="calMove(-1)">‹</button>
+        <div class="cal-m" id="cal-m"></div>
+        <button class="cal-arr" onclick="calMove(1)">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div id="cal-entry" style="display:none"></div>
+    <div id="ms-box" style="display:none" class="ms-box">
+      <div class="ms-lbl">📊 <span id="ms-lbl-txt"></span>のサマリー</div>
+      <div class="ms-body" id="ms-body"></div>
+    </div>
+    <div id="ms-btn-wrap" style="margin-top:.75rem;display:none">
+      <button class="btn btn-gh btn-sm btn-bl" id="ms-btn" onclick="genMonthlySummary()">✦ 月間サマリーをAIで生成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MONTHLY VIEW ══ -->
+<div id="tab-monthly" class="content" style="display:none">
+  <div class="pg-title">月間ビュー</div>
+  <div class="pg-sub">月ごとの日記を一覧で確認できます。CSVエクスポートも可能です。</div>
+
+  <!-- CSV Export Panel -->
+  <div class="csv-panel">
+    <div style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:.1rem">📥 CSVエクスポート</div>
+    <div style="font-size:.78rem;color:var(--soft);margin-bottom:.65rem">期間を指定してダウンロード</div>
+    <div class="csv-row">
+      <input class="date-inp" type="date" id="csv-from">
+      <span class="csv-sep">〜</span>
+      <input class="date-inp" type="date" id="csv-to">
+      <button class="btn btn-nv btn-sm" onclick="exportCSV()">⬇ CSVダウンロード</button>
+    </div>
+  </div>
+
+  <!-- Month selector -->
+  <div class="mv-controls">
+    <select class="mv-select" id="mv-year" onchange="renderMonthlyTable()"></select>
+    <select class="mv-select" id="mv-month" onchange="renderMonthlyTable()"></select>
+    <span id="mv-count" style="font-size:.8rem;color:var(--soft)"></span>
+  </div>
+
+  <!-- Table -->
+  <div class="tbl-wrap">
+    <table class="tbl" id="mv-table">
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>📍 Place &amp; Weather</th>
+          <th>🙏 Gratitude</th>
+          <th>✅ Good</th>
+          <th>🔧 Better</th>
+          <th>💭 Free Format</th>
+          <th>AI要約</th>
+        </tr>
+      </thead>
+      <tbody id="mv-tbody"></tbody>
+    </table>
+  </div>
+  <div id="mv-empty" style="display:none" class="no-res">この月の記録はありません</div>
+</div>
+
+</div><!-- .app -->
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+// ══════════════════════════════════════════
+// Constants
+// ══════════════════════════════════════════
+const FIELDS = ['place','gratitude','good','better','free'];
+const LABELS = {place:'Place & Weather',gratitude:'Gratitude',good:'Good',better:'Better',free:'Free Format'};
+const LSK = 'wj5';
+
+// ══════════════════════════════════════════
+// State
+// ══════════════════════════════════════════
+let entries = [];
+let insightsCache = '';
+let monthlySummaries = {};
+let chatHistory = [];   // {role:'user'|'assistant', content:string}[]
+let calYear, calMonth, selDate = null;
+let activeRec = null;
+
+// ══════════════════════════════════════════
+// Date helpers  ← FIX #3: UTC→JST変換
+// ══════════════════════════════════════════
+function localDateStr(isoStr) {
+  // ISOの日付文字列を日本時間のYYYY-MM-DDに変換
+  const d = new Date(isoStr);
+  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000); // UTC+9
+  return jst.toISOString().slice(0, 10);
+}
+function fmtDate(isoStr) {
+  const d = new Date(isoStr);
+  return d.toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
+}
+function fmtTime(isoStr) {
+  const d = new Date(isoStr);
+  return d.toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'});
+}
+
+// ══════════════════════════════════════════
+// Boot
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  const n = new Date();
+  document.getElementById('hdr-date').innerHTML =
+    n.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'})
+    +'<br>'+n.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  calYear = n.getFullYear(); calMonth = n.getMonth();
+  // CSV デフォルト日付（今月初〜今日）
+  const y=n.getFullYear(),m=String(n.getMonth()+1).padStart(2,'0'),d=String(n.getDate()).padStart(2,'0');
+  document.getElementById('csv-from').value=`${y}-${m}-01`;
+  document.getElementById('csv-to').value=`${y}-${m}-${d}`;
+  await loadEntries();
+  renderStats(); updateInsBtn(); populateMvSelectors();
+  // resize chat textarea
+  const ta=document.getElementById('chat-inp');
+  if(ta) ta.addEventListener('input',()=>{ta.style.height='';ta.style.height=Math.min(ta.scrollHeight,120)+'px';});
+});
+
+// ══════════════════════════════════════════
+// Storage (cloud with localStorage fallback)
+// ══════════════════════════════════════════
+async function loadEntries() {
+  try {
+    const r = await fetch('/api/db?action=list');
+    if (r.ok) {
+      const d = await r.json();
+      entries = d.entries || [];
+      insightsCache = d.insightsCache || '';
+      monthlySummaries = d.monthlySummaries || {};
+      setBadge('cloud'); return;
+    }
+  } catch(e){}
+  try {
+    const raw = localStorage.getItem(LSK);
+    if (raw) { const d=JSON.parse(raw); entries=d.entries||[]; insightsCache=d.insightsCache||''; monthlySummaries=d.monthlySummaries||{}; }
+  } catch(e){}
+  setBadge('local');
+}
+
+async function persistEntry(entry) {
+  try {
+    const r = await fetch('/api/db',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'add_entry',entry})});
+    if(r.ok){setBadge('cloud');return;}
+  } catch(e){}
+  saveLocal(); setBadge('local');
+}
+
+async function persistState(patch) {
+  if(patch.insightsCache!==undefined) insightsCache=patch.insightsCache;
+  if(patch.monthlySummaries!==undefined) monthlySummaries=patch.monthlySummaries;
+  try {
+    const r = await fetch('/api/db',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save_state',insightsCache,monthlySummaries})});
+    if(r.ok) return;
+  } catch(e){}
+  saveLocal();
+}
+
+function saveLocal(){
+  try{localStorage.setItem(LSK,JSON.stringify({entries,insightsCache,monthlySummaries}));}catch(e){}
+}
+
+function setBadge(type){
+  const el=document.getElementById('db-badge');
+  if(type==='cloud'){el.className='db-badge db-ok';el.textContent='☁ Turso';}
+  else{el.className='db-badge db-local';el.textContent='💾 Local';}
+}
+
+// ══════════════════════════════════════════
+// Tab navigation
+// ══════════════════════════════════════════
+const TABS = ['journal','insights','history','monthly'];
+function showTab(id) {
+  TABS.forEach(t=>document.getElementById('tab-'+t).style.display=t===id?'':'none');
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',TABS[i]===id));
+  if(id==='history') renderHistory();
+  if(id==='insights'){renderInsights();updateInsBtn();}
+  if(id==='monthly') renderMonthlyTable();
+}
+
+function insTab(id){
+  ['analysis','chat'].forEach(t=>{
+    document.getElementById('ins-'+t).style.display=t===id?'':'none';
+    document.getElementById('itab-'+t).classList.toggle('active',t===id);
+  });
+}
+
+// ══════════════════════════════════════════
+// Voice input
+// ══════════════════════════════════════════
+function voice(field){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('このブラウザは音声入力に未対応です');return;}
+  const btn=document.getElementById('mic-'+field);
+  if(activeRec){activeRec.stop();return;}
+  const rec=new SR();rec.lang='ja-JP';rec.continuous=true;rec.interimResults=true;
+  activeRec=rec;btn.classList.add('rec');btn.textContent='⏹';
+  let final=document.getElementById('f-'+field).value;
+  rec.onresult=e=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById('f-'+field).value=final+interim;
+  };
+  const end=()=>{btn.classList.remove('rec');btn.textContent='🎤';activeRec=null;};
+  rec.onend=end;rec.onerror=end;rec.start();
+}
+
+// ══════════════════════════════════════════
+// Save journal entry
+// ══════════════════════════════════════════
+async function saveEntry(){
+  const vals={};let ok=false;
+  FIELDS.forEach(f=>{vals[f]=document.getElementById('f-'+f).value.trim();if(vals[f])ok=true;});
+  if(!ok){toast('何か入力してから保存してください');return;}
+  const btn=document.getElementById('save-btn');
+  btn.disabled=true;btn.textContent='保存中...';
+  let summary='';
+  try{
+    summary=await aiSimple(
+      'あなたは優れたライフコーチです。ジャーナルエントリーを読んで3〜4文で温かく洞察のある要約を日本語で書いてください。思考・感情・気づきの核心を捉え、前向きな視点で締めてください。',
+      '今日のジャーナルを要約してください:\n\n'+FIELDS.filter(f=>vals[f]).map(f=>`[${LABELS[f]}]\n${vals[f]}`).join('\n\n')
+    );
+  }catch(e){}
+  const entry={id:String(Date.now()),date:new Date().toISOString(),fields:vals,summary};
+  entries.unshift(entry);
+  await persistEntry(entry);
+  btn.disabled=false;btn.textContent='✓ 保存 + AI要約';
+  toast('✓ 保存しました');
+  renderStats();updateInsBtn();populateMvSelectors();
+  if(summary) document.getElementById('summary-area').innerHTML=`<div class="ai-box"><div class="ai-lbl">✦ AI 要約</div><div class="ai-txt">${esc(summary)}</div></div>`;
+  clearFields();
+}
+
+function clearFields(){FIELDS.forEach(f=>document.getElementById('f-'+f).value='');document.getElementById('summary-area').innerHTML='';}
+
+function renderStats(){
+  const s=document.getElementById('stats');
+  if(!entries.length){s.style.display='none';return;}
+  s.style.display='grid';
+  document.getElementById('st-total').textContent=entries.length;
+  const days=new Set(entries.map(e=>localDateStr(e.date)));
+  document.getElementById('st-days').textContent=days.size;
+  let streak=0;
+  const today=localDateStr(new Date().toISOString());
+  let d=new Date();
+  while(true){
+    const ds=localDateStr(d.toISOString());
+    if(!days.has(ds)) break;
+    streak++;d.setDate(d.getDate()-1);
+    if(streak>3650) break;
+  }
+  document.getElementById('st-streak').textContent=streak;
+}
+
+// ══════════════════════════════════════════
+// Insights - Analysis
+// ══════════════════════════════════════════
+function updateInsBtn(){
+  const b=document.getElementById('ins-btn');
+  if(b) b.textContent=entries.length>0?`◈ AI分析を実行 (${entries.length}件の記録)`:'◈ AI分析を実行する';
+}
+function renderInsights(){
+  if(insightsCache) document.getElementById('ins-result').innerHTML=`<div class="card card-cy"><div class="ai-body">${md(insightsCache)}</div></div>`;
+}
+
+async function runInsights(){
+  if(!entries.length){toast('まずジャーナルを記録してください');return;}
+  document.getElementById('ins-loading').style.display='';
+  const b=document.getElementById('ins-btn');b.disabled=true;b.textContent='分析中...';
+  const ctx=buildContext(60);
+  const msg=`以下は私のジャーナルです。4点について具体的なインサイトを提供してください。\n\n## ジャーナル記録\n${ctx}\n\n## 1. 思考・価値観の変遷\n時系列で見た変化・成長のパターン\n\n## 2. 繰り返し現れるテーマと強み\n深層にある動機・こだわり・自分らしさの核心\n\n## 3. 自己分析\n性格・意思決定スタイル・感情パターンの本質\n\n## 4. 人生・仕事の方向性\n今後6〜12ヶ月で進むべき方向と、明日からできる具体的な一歩3つ`;
+  try{
+    // FIX #2: 正しいシングルターン呼び出し
+    const r=await aiSimple(
+      'あなたは深い洞察力を持つライフコーチ兼自己分析の専門家です。表面的な言葉の先にある深層の動機・パターン・価値観を見抜き、温かく率直に、具体的で行動可能なインサイトを日本語で提供します。',
+      msg
+    );
+    insightsCache=r;
+    await persistState({insightsCache:r});
+    document.getElementById('ins-result').innerHTML=`<div class="card card-cy"><div class="ai-body">${md(r)}</div></div>`;
+  }catch(e){
+    document.getElementById('ins-result').innerHTML=`<div class="card"><p style="color:#EF4444;font-size:.88rem">エラー: ${esc(String(e.message))}</p></div>`;
+  }
+  document.getElementById('ins-loading').style.display='none';
+  b.disabled=false;updateInsBtn();
+}
+
+// ══════════════════════════════════════════
+// Insights - Chat  FIX #1
+// ══════════════════════════════════════════
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const q=inp.value.trim();if(!q)return;
+  inp.value='';inp.style.height='';
+  const sendBtn=document.getElementById('chat-send-btn');sendBtn.disabled=true;
+
+  appendChatMsg('user',esc(q));
+  const typingId=appendChatMsg('ai','<div class="spin" style="width:18px;height:18px;border-width:2px;margin:4px 0"></div>');
+
+  // Build system prompt with journal context embedded
+  const ctx=buildContext(40);
+  const system=`あなたは私（ユーザー）の個人ジャーナルアシスタントです。以下は私のこれまでのジャーナル記録です。この記録を参照しながら、私の質問に対して温かく、具体的に答えてください。記録に基づいた具体的な例を示しながら答えると効果的です。記録にない情報については正直にその旨を伝えてください。
+
+## ジャーナル記録（直近${Math.min(entries.length,40)}件）
+${ctx}`;
+
+  // chatHistory に今の質問を追加
+  chatHistory.push({role:'user', content:q});
+
+  try{
+    // FIX #1: chatHistory を正しく渡す（system + messages で呼び出し）
+    const r = await aiChat(system, chatHistory);
+    chatHistory.push({role:'assistant', content:r});
+    updateChatMsg(typingId,`<div class="ai-body">${md(r)}</div>`);
+  }catch(e){
+    chatHistory.pop(); // 失敗したら追加を戻す
+    updateChatMsg(typingId,`<span style="color:#EF4444;font-size:.85rem">エラー: ${esc(String(e.message))}</span>`);
+  }
+  sendBtn.disabled=false;
+  const msgs=document.getElementById('chat-msgs');msgs.scrollTop=msgs.scrollHeight;
+}
+
+let _mc=0;
+function appendChatMsg(role,html){
+  const id='m-'+(++_mc);
+  const el=document.createElement('div');
+  el.className=`cmsg ${role}`;el.id=id;
+  el.innerHTML=`<div class="cavatar ${role}">${role==='ai'?'AI':'私'}</div><div class="cbubble">${html}</div>`;
+  const msgs=document.getElementById('chat-msgs');msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+  return id;
+}
+function updateChatMsg(id,html){const el=document.getElementById(id);if(el) el.querySelector('.cbubble').innerHTML=html;}
+
+// ══════════════════════════════════════════
+// History tab
+// ══════════════════════════════════════════
+function renderHistory(){
+  document.getElementById('hist-sub').textContent=`${entries.length}件のエントリー`;
+  renderCalendar();renderMonthlySummaryArea();
+}
+
+function onSearch(){
+  const q=document.getElementById('s-inp').value.trim();
+  const sr=document.getElementById('search-res');
+  const cv=document.getElementById('cal-view');
+  if(!q){sr.style.display='none';cv.style.display='';return;}
+  cv.style.display='none';sr.style.display='';
+  const hits=entries.filter(e=>{
+    const all=[...Object.values(e.fields||{}),e.summary||''].join(' ').toLowerCase();
+    return all.includes(q.toLowerCase());
+  });
+  if(!hits.length){sr.innerHTML=`<div class="no-res">「${esc(q)}」に一致する記録が見つかりませんでした</div>`;return;}
+  sr.innerHTML=`<div class="sr-lbl">${hits.length}件見つかりました</div>`+hits.map(e=>entryCard(e,q)).join('');
+}
+
+function calMove(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}else if(calMonth<0){calMonth=11;calYear--;}renderCalendar();renderMonthlySummaryArea();}
+
+function renderCalendar(){
+  document.getElementById('cal-m').textContent=`${calYear}年${calMonth+1}月`;
+  const grid=document.getElementById('cal-grid');
+  const dows=['日','月','火','水','木','金','土'];
+  let html=dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  // FIX #3: localDateStr() でエントリー日付を日本時間に変換して比較
+  const eDates=new Set(entries.map(e=>{
+    const ds=localDateStr(e.date);
+    const [y,m,d]=ds.split('-').map(Number);
+    return y===calYear&&(m-1)===calMonth?d:null;
+  }).filter(Boolean));
+
+  const today=new Date();
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  for(let i=0;i<firstDay;i++) html+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const hasE=eDates.has(d);const isSel=selDate===ds;
+    const cls=['cal-cell',hasE?'has':'',isToday?'today':'',isSel?'sel':''].filter(Boolean).join(' ');
+    html+=`<div class="${cls}"${hasE?` onclick="selDay('${ds}')"`:''}>${d}</div>`;
+  }
+  grid.innerHTML=html;
+}
+
+function selDay(ds){
+  selDate=ds;renderCalendar();
+  // FIX #3: localDateStr() で比較
+  const e=entries.find(en=>localDateStr(en.date)===ds);
+  const el=document.getElementById('cal-entry');
+  if(e){el.style.display='';el.innerHTML=`<div class="card card-cy">${entryInner(e)}</div>`;el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  else{el.style.display='none';}
+}
+
+function renderMonthlySummaryArea(){
+  const key=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const wrap=document.getElementById('ms-btn-wrap');const box=document.getElementById('ms-box');
+  const me=entries.filter(e=>{const ds=localDateStr(e.date);const[y,m]=ds.split('-').map(Number);return y===calYear&&(m-1)===calMonth;});
+  if(!me.length){wrap.style.display='none';box.style.display='none';return;}
+  document.getElementById('ms-lbl-txt').textContent=`${calYear}年${calMonth+1}月`;
+  if(monthlySummaries[key]){
+    box.style.display='';document.getElementById('ms-body').innerHTML=md(monthlySummaries[key]);
+    wrap.style.display='';document.getElementById('ms-btn').textContent='✦ 月間サマリーを再生成';
+  }else{
+    box.style.display='none';wrap.style.display='';
+    document.getElementById('ms-btn').textContent=`✦ ${calYear}年${calMonth+1}月のサマリーをAIで生成`;
+  }
+}
+
+async function genMonthlySummary(){
+  const key=`${calYear}-${String(calMonth+1).padStart(2,'0')}`;
+  const me=entries.filter(e=>{const ds=localDateStr(e.date);const[y,m]=ds.split('-').map(Number);return y===calYear&&(m-1)===calMonth;});
+  if(!me.length){toast('この月の記録がありません');return;}
+  const btn=document.getElementById('ms-btn');btn.disabled=true;btn.textContent='生成中...';
+  const text=me.map(e=>{
+    const d=fmtDate(e.date);
+    return `${d}: `+FIELDS.filter(f=>e.fields?.[f]).map(f=>e.fields[f]).join(' / ')+(e.summary?' ('+e.summary+')':'');
+  }).join('\n');
+  try{
+    const r=await aiSimple(
+      `あなたは優れたライフコーチです。${calYear}年${calMonth+1}月のジャーナル記録を読んで、その月を振り返るサマリーを日本語で書いてください。その月の主なテーマ・感情の流れ・成長・学びを200〜300字程度で自然な文章にまとめてください。`,
+      `以下は${calYear}年${calMonth+1}月の記録です:\n\n${text}`
+    );
+    const updated={...monthlySummaries,[key]:r};
+    await persistState({monthlySummaries:updated});
+    document.getElementById('ms-body').innerHTML=md(r);
+    document.getElementById('ms-box').style.display='';
+    btn.textContent='✦ 月間サマリーを再生成';
+  }catch(e){toast('生成に失敗しました: '+e.message);}
+  btn.disabled=false;
+}
+
+// ══════════════════════════════════════════
+// Monthly Table View  FIX #4
+// ══════════════════════════════════════════
+function populateMvSelectors(){
+  if(!entries.length) return;
+  const years=new Set(entries.map(e=>localDateStr(e.date).slice(0,4)));
+  const ySel=document.getElementById('mv-year');
+  const cur=ySel.value;
+  ySel.innerHTML=[...years].sort((a,b)=>b-a).map(y=>`<option value="${y}">${y}年</option>`).join('');
+  if(cur&&[...years].includes(cur)) ySel.value=cur;
+  const mSel=document.getElementById('mv-month');
+  mSel.innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}月</option>`).join('');
+  const n=new Date();
+  mSel.value=String(n.getMonth()+1);
+}
+
+function renderMonthlyTable(){
+  const y=parseInt(document.getElementById('mv-year').value||new Date().getFullYear());
+  const m=parseInt(document.getElementById('mv-month').value||new Date().getMonth()+1);
+  const key=`${y}-${String(m).padStart(2,'0')}`;
+
+  const me=entries.filter(e=>{
+    const ds=localDateStr(e.date);
+    return ds.startsWith(key);
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+
+  document.getElementById('mv-count').textContent=me.length?`${me.length}件`:'';
+  const tbody=document.getElementById('mv-tbody');
+  const empty=document.getElementById('mv-empty');
+  const tbl=document.getElementById('mv-table');
+
+  if(!me.length){tbody.innerHTML='';tbl.style.display='none';empty.style.display='';return;}
+  tbl.style.display='';empty.style.display='none';
+
+  tbody.innerHTML=me.map(e=>{
+    const ds=localDateStr(e.date);
+    const dayNum=parseInt(ds.split('-')[2]);
+    const dateLabel=`${m}/${dayNum}`;
+    const cells=FIELDS.map(f=>`<td>${e.fields?.[f]?cellText(e.fields[f]):'<span class="empty-cell">—</span>'}</td>`).join('');
+    const sumCell=`<td>${e.summary?cellText(e.summary):'<span class="empty-cell">—</span>'}</td>`;
+    return`<tr><td>${dateLabel}</td>${cells}${sumCell}</tr>`;
+  }).join('');
+}
+
+function cellText(t){
+  // 長いテキストは折り返して表示（改行込み）
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ══════════════════════════════════════════
+// CSV Export  FIX #5
+// ══════════════════════════════════════════
+function exportCSV(){
+  const from=document.getElementById('csv-from').value;
+  const to=document.getElementById('csv-to').value;
+  if(!from||!to){toast('開始日と終了日を入力してください');return;}
+  const filtered=entries.filter(e=>{
+    const ds=localDateStr(e.date);
+    return ds>=from&&ds<=to;
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!filtered.length){toast('指定期間の記録がありません');return;}
+
+  const header=['日付','時刻',...FIELDS.map(f=>LABELS[f]),'AI要約'];
+  const rows=filtered.map(e=>{
+    const ds=localDateStr(e.date);
+    const t=fmtTime(e.date);
+    const cols=[ds,t,...FIELDS.map(f=>e.fields?.[f]||''),e.summary||''];
+    return cols.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',');
+  });
+
+  const csv='\uFEFF'+[header.join(','),...rows].join('\n'); // BOM付きでExcelでも文字化けしない
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`wataru-journal_${from}_${to}.csv`;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
+  toast(`✓ ${filtered.length}件をCSVでダウンロードしました`);
+}
+
+// ══════════════════════════════════════════
+// Helpers
+// ══════════════════════════════════════════
+function buildContext(limit=50){
+  return entries.slice(0,limit).map(e=>{
+    const d=fmtDate(e.date);
+    const parts=FIELDS.filter(f=>e.fields?.[f]).map(f=>`[${LABELS[f]}] ${e.fields[f]}`);
+    return`◆ ${d}\n${parts.join('\n')}${e.summary?'\n→要約: '+e.summary:''}`;
+  }).join('\n\n');
+}
+
+function entryCard(e,q=''){return`<div class="card">${entryInner(e,q)}</div>`;}
+function entryInner(e,q=''){
+  const d=fmtDate(e.date);const t=fmtTime(e.date);
+  const fields=FIELDS.filter(f=>e.fields?.[f]).map(f=>`<div class="ef"><strong>${LABELS[f]}</strong>${q?hl(e.fields[f],q):esc(e.fields[f])}</div>`).join('');
+  const sum=e.summary?`<div class="e-sum"><strong>AI要約</strong>${q?hl(e.summary,q):esc(e.summary)}</div>`:'';
+  return`<div class="e-date">${d} ${t}</div>${fields}${sum}`;
+}
+function hl(text,q){const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');return esc(text).replace(re,m=>`<mark style="background:var(--yellow);border-radius:3px;padding:0 2px">${m}</mark>`);}
+
+// ══════════════════════════════════════════
+// API calls  — FIX #1 & #2
+// ══════════════════════════════════════════
+
+// シンプルな1回呼び出し（インサイト分析・要約・月間サマリー）
+async function aiSimple(system, userMsg){
+  const res=await fetch('/api/claude',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({system, messages:[{role:'user',content:userMsg}]})
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||`HTTP ${res.status}`);}
+  const data=await res.json();
+  return data.text||'';
+}
+
+// チャット用（履歴を引き継いだマルチターン）
+async function aiChat(system, history){
+  // historyの最後が必ずuserであることを確認
+  const msgs=[...history];
+  if(!msgs.length||msgs[msgs.length-1].role!=='user'){
+    throw new Error('最後のメッセージがuserではありません');
+  }
+  const res=await fetch('/api/claude',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({system, messages:msgs})
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||`HTTP ${res.status}`);}
+  const data=await res.json();
+  return data.text||'';
+}
+
+// ══════════════════════════════════════════
+// UI helpers
+// ══════════════════════════════════════════
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.display='';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2800);
+}
+function esc(s=''){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function md(text){
+  if(!text)return'';
+  let h=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');h=h.replace(/^# (.+)$/gm,'<h2>$1</h2>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');h=h.replace(/^---$/gm,'<hr>');
+  h=h.replace(/^[•\-\*] (.+)$/gm,'<li>$1</li>');h=h.replace(/(<li>.*?<\/li>)/gs,m=>`<ul>${m}</ul>`);h=h.replace(/<\/ul>\s*<ul>/g,'');
+  h=h.split('\n').map(l=>{l=l.trim();if(!l)return'';if(/^<(h[23]|ul|li|hr)/.test(l))return l;return`<p>${l}</p>`;}).join('');
+  return h;
+}
+</script>
+</body>
+</html>
