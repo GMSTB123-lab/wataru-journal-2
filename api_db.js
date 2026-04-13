@@ -1,7 +1,7 @@
 // api/db.js — Turso データベース プロキシ
 // Tursoの libsql HTTP APIを使ってデータを読み書きします
 
-const TURSO_URL = process.env.TURSO_URL;libsql://wataru-journal-wataru303148.aws-ap-northeast-1.turso.io    // 例: libsql://your-db.turso.io
+const TURSO_URL = process.env.TURSO_URL; libsql://wataru-journal-wataru303148.aws-ap-northeast-1.turso.io    // 例: libsql://your-db.turso.io
 const TURSO_TOKEN = process.env.TURSO_TOKEN; eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzYwNDU5NzEsImlkIjoiMDE5ZDg0OTUtZjQwMS03YTViLThlNDEtMzZhMjBkM2VkNmE1IiwicmlkIjoiNTZjYzk0NGEtZmY4Yy00MDQxLWI1OTctMWNkMDk2NTFmODE3In0.EsrSfWWXG5HgU-CYFVEfT5sGHNpHIqoAr9Qlxkx6TN8zrCz6KWQu-d6JjV1PFR0eAa6UMqc6tG7BAuxiTqyZAA // Turso auth token
 
 async function turso(sql, args = []) {
